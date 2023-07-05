@@ -8,20 +8,66 @@ function EmployeeController(prop) {
     self.selectedEmployee = ko.observable(new EmployeeModel());
     self.newEmployee = ko.observable(new EmployeeModel());
     self.employees = ko.observableArray([]);
-
-
-
-
-
-
-
-    ajax.get(baseUrl).then(function (result) {
-        var datas = ko.utils.arrayMap(result, function (item) {
-            return new EmployeeModel(item);
+    self.skipCount = ko.observable(0);
+    self.take = ko.observable(5);
+    self.hasPreviousPage = ko.observable(false);
+    self.hasNextPage = ko.observable(false);
+   
+   
+     
+    //self.getData = () => {
+    //    ajax.get(baseUrl + "?skipcount=" + ko.toJS(self.skipCount()) + "&take=" + ko.toJS(self.take())).then(function (result) {
+    //        console.log(ko.toJS(self.skipCount()));
+    //        console.log(ko.toJS(self.take()));
+    //        var datas = ko.utils.arrayMap(result, function (item) {
+    //            return new EmployeeModel(item);
+    //        });
+    //        self.employees(datas);
+    //    });
+    //};
+    self.getData = () => {
+        ajax.get(baseUrl + "?skipcount=" + ko.toJS(self.skipCount()) + "&take=" + ko.toJS(self.take())).then(function (result) {
+            var datas = ko.utils.arrayMap(result, function (item) {
+                return new EmployeeModel(item);
+            });
+            self.employees(datas);
+            
+            // Check if there are previous or next pages
+            self.hasPreviousPage(self.skipCount() > 0);
+            self.hasNextPage(result.length >= self.take());
         });
-        self.employees(datas);
-    });
+    };
 
+    self.getData();
+    
+    //self.PreviousData = function () {
+         
+
+    //    self.skipCount(self.skipCount() - 10);
+    //    self.getData();
+
+
+    //}
+    //self.NextData = function () {
+    //     //self.skipCount(self.skipCount() + 1);
+    //    self.skipCount(self.skipCount() + 10);
+    //    self.getData();
+
+    //}
+    self.PreviousData = function () {
+        self.skipCount(self.skipCount() - self.take());
+        self.getData();
+    };
+
+    self.NextData = function () {
+        self.skipCount(self.skipCount() + self.take());
+        self.getData();
+    };
+    
+
+    self.closemodal = function () {
+         self.resetForm(); 
+    }
 
 
     self.addEmployee = function () {
@@ -57,11 +103,19 @@ function EmployeeController(prop) {
         self.selectedEmployee(new EmployeeModel());
         self.mode(mode.create);
     }
-    self.selectEmployee = (model) => {
+    //self.selectEmployee = (model) => {
+    //    self.selectedEmployee(model);
+    //    self.newEmployee(new EmployeeModel(ko.toJS(model)));
+    //    self.mode(mode.update);
+    //};
+    self.selectEmployee = function (model) {
         self.selectedEmployee(model);
         self.newEmployee(new EmployeeModel(ko.toJS(model)));
         self.mode(mode.update);
+        $('.add-employee-button').hide();
+        $('.update-employee-button').show();
     };
+
 
     self.deleteEmployee = (model) => {
         ajax.delete(baseUrl + "/" + ko.toJS(model).id).done((result) => {
@@ -70,6 +124,11 @@ function EmployeeController(prop) {
         })
        
     };
+    
+
+       
+    
+
 }
 
 var ajax = {

@@ -1,47 +1,73 @@
-﻿ 
- 
-<h4>Employee Details</h4>
-<div class="card">
-    <div class="card-header">New Employee</div>
-    <div class="card-body" data-bind="with: newEmployee">
-        <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" class="form-control" name="name" data-bind="value: name" />
-        </div>
-        <div class="form-group">
-            <label for="gender">Gender</label>
-            <div class="form-check">
-                <input type="radio" class="form-check-input" name="gender" value="Male" data-bind="checked: gender" />
-                <label class="form-check-label" for="gender">Male</label>
+﻿<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+    Register Employee
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
+                <button data-bind="click: $root.closemodal" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="form-check">
-                <input type="radio" class="form-check-input" name="gender" value="Female" data-bind="checked: gender" />
-                <label class="form-check-label" for="gender">Female</label>
+            <div class="modal-body">
+
+                <div class="card">
+                    <div class="card-header">New Employee</div>
+                    <div class="card-body" data-bind="with: newEmployee">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" name="name" data-bind="value: name" />
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">Gender</label>
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" name="gender" value="Male" data-bind="checked: gender" />
+                                <label class="form-check-label" for="gender">Male</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" name="gender" value="Female" data-bind="checked: gender" />
+                                <label class="form-check-label" for="gender">Female</label>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <input type="text" class="form-control" name="address" data-bind="value: address" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="department">Department</label>
+                            <input type="text" class="form-control" name="department" data-bind="value: department" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="salary">Salary</label>
+                            <input type="text" class="form-control" name="salary" data-bind="value: salary" />
+                        </div>
+
+                        <div class="card-footer">
+                            @*                <button class="btn btn-primary" data-bind="click: $parent.addEmployee">Add</button> *@
+                            <button class="btn btn-primary" data-bind="click: $parent.addEmployee, visible: $parent.mode() === mode.create">Add</button>
+                            <button class="btn btn-primary" data-bs-dismiss="modal" data-bind="click: $parent.addEmployee, visible: $parent.mode() === mode.update">Update</button>
+
+                            <button class="btn btn-primary" data-bind="click: $root.resetForm">Reset</button>
+                        </div>
+
+
+                    </div>
+                </div>
             </div>
-        </div>
-
-
-        <div class="form-group">
-            <label for="address">Address</label>
-            <input type="text" class="form-control" name="address" data-bind="value: address" />
-        </div>
-
-        <div class="form-group">
-            <label for="department">Department</label>
-            <input type="text" class="form-control" name="department" data-bind="value: department" />
-        </div>
-
-        <div class="form-group">
-            <label for="salary">Salary</label>
-            <input type="text" class="form-control" name="salary" data-bind="value: salary" />
-        </div>
-
-        <div class="card-footer">
-            <button class="btn btn-primary" data-bind="click: $parent.addEmployee">Add</button>
-            <button class="btn btn-primary" data-bind="click: $root.resetForm">Reset</button>
         </div>
     </div>
 </div>
+
+
+
+
+
 
 <table class="table table-striped">
     <thead>
@@ -56,11 +82,14 @@
             <th>Action</th>
         </tr>
     </thead>
+    @*    <tbody data-bind="foreach: employees">
+    *@
     <tbody data-bind="foreach: employees">
+
         <tr>
-            <td data-bind="text: $index() + 1"></td>
+            <td data-bind="text: $index() + $root.skipCount() + 1"></td>
             <td data-bind="text: name"></td>
-          <td data-bind="text: gender"></td>
+            <td data-bind="text: gender"></td>
 
             <td data-bind="text: address"></td>
             <td data-bind="text: department"></td>
@@ -68,7 +97,10 @@
 
             <td>
                 <div class="btn-group btn-group-sm">
-                    <button data-bind="click: $parent.selectEmployee" class="btn btn-sm btn-dark"><i class="fa fa-edit"></i> Edit</button>
+                    <button data-bind="click: $parent.selectEmployee" class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="fa fa-edit"></i> Edit</button>
+
+                    @*                    <button data-bind="click: $parent.selectEmployee, visible: $parent.mode() === mode.create" class="btn btn-sm btn-dark"><i class="fa fa-edit"></i> Edit</button>
+                    *@
                     <button data-bind="click: $parent.deleteEmployee" class="btn btn-sm btn-danger"><i class="fa fa-edit"></i> Delete</button>
                 </div>
             </td>
@@ -84,11 +116,30 @@
     </tfoot>
 </table>
 
+
+@*<button data-bind="click: $root.PreviousData">Previous</button>
+    <button data-bind="click: $root.NextData">Next</button>*@
+<div class="pagination">
+    <button data-bind="click: $root.PreviousData, enable: hasPreviousPage">Previous</button>
+    <button data-bind="click: $root.NextData, enable: hasNextPage">Next</button>
+</div>
+
+
+
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+
 @section Scripts{
     <script src="~/js/knockoutjs3.5.1.js"></script>
     <script src="~/js/app/employee.controller.js"></script>
     <script src="~/js/app/employee.model.js"></script>
-     <script>
+
+
+    <script>
         var obj = new EmployeeController();
         ko.applyBindings(obj);
     </script>

@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,13 +23,24 @@ namespace EmployeeKnockOut.Controllers.API
 
         // GET: api/EmployeeModels
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EmployeeModel>>> GetEmployeeModel()
+        public async Task<ActionResult<IEnumerable<EmployeeModel>>> GetEmployeeModel(int skipcount = 0, int take = 0)
         {
-          if (_context.EmployeeModel == null)
-          {
-              return NotFound();
-          }
-            return await _context.EmployeeModel.ToListAsync();
+
+            if (_context.EmployeeModel == null)
+            {
+                return null;
+            };
+
+
+            var data = _context.EmployeeModel
+            .Skip(skipcount)
+            .Take(take)
+            .ToList();
+            if (data == null)
+            {
+                return null;
+            }
+            return data;
         }
 
         // GET: api/EmployeeModels/5
@@ -49,6 +60,28 @@ namespace EmployeeKnockOut.Controllers.API
 
             return employeeModel;
         }
+        //public List<EmployeeModel> GetEmployeeModel()
+        //{
+        //    if (_context.EmployeeModel == null)
+        //    {
+        //        return null;
+        //    };
+
+           
+        //    var data = _context.EmployeeModel
+        //    .Skip(skipcount)
+        //    .Take(take)
+        //    .ToList();
+        //    if (data == null)
+        //    {
+        //        return null;
+        //    }
+        //    return data;
+        //}
+
+
+
+
 
         // PUT: api/EmployeeModels/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
