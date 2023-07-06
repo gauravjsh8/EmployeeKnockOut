@@ -1,4 +1,4 @@
-﻿ 
+﻿
 
 function EmployeeController(prop) {
     var self = this;
@@ -12,9 +12,9 @@ function EmployeeController(prop) {
     self.take = ko.observable(5);
     self.hasPreviousPage = ko.observable(false);
     self.hasNextPage = ko.observable(false);
-   
-   
-     
+
+
+
     //self.getData = () => {
     //    ajax.get(baseUrl + "?skipcount=" + ko.toJS(self.skipCount()) + "&take=" + ko.toJS(self.take())).then(function (result) {
     //        console.log(ko.toJS(self.skipCount()));
@@ -27,21 +27,23 @@ function EmployeeController(prop) {
     //};
     self.getData = () => {
         ajax.get(baseUrl + "?skipcount=" + ko.toJS(self.skipCount()) + "&take=" + ko.toJS(self.take())).then(function (result) {
-            var datas = ko.utils.arrayMap(result, function (item) {
+            var datas = ko.utils.arrayMap(result.data, function (item) {
                 return new EmployeeModel(item);
             });
             self.employees(datas);
-            
+
+            var total = result.total || 0;
+
             // Check if there are previous or next pages
             self.hasPreviousPage(self.skipCount() > 0);
-            self.hasNextPage(result.length >= self.take());
+            self.hasNextPage(total > (self.skipCount() + self.take()));
         });
     };
 
     self.getData();
-    
+
     //self.PreviousData = function () {
-         
+
 
     //    self.skipCount(self.skipCount() - 10);
     //    self.getData();
@@ -63,10 +65,10 @@ function EmployeeController(prop) {
         self.skipCount(self.skipCount() + self.take());
         self.getData();
     };
-    
+
 
     self.closemodal = function () {
-         self.resetForm(); 
+        self.resetForm();
     }
 
 
@@ -122,12 +124,12 @@ function EmployeeController(prop) {
             self.employees.remove(model);
             self.mode(mode.create);
         })
-       
-    };
-    
 
-       
-    
+    };
+
+
+
+
 
 }
 
@@ -168,7 +170,7 @@ var ajax = {
         return $.ajax({
             method: "DELETE",
             url: url
-           
+
         });
 
     }

@@ -1,4 +1,4 @@
-﻿ using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EmployeeKnockOut.Data;
 using EmployeeKnockOut.Models;
+using EmployeeKnockOut.Services.IServices;
 
 namespace EmployeeKnockOut.Controllers.API
 {
@@ -15,43 +16,46 @@ namespace EmployeeKnockOut.Controllers.API
     public class EmployeeModelsController : ControllerBase
     {
         private readonly EmployeeKnockOutContext _context;
+        private readonly IEmployeeService _Employee;
 
-        public EmployeeModelsController(EmployeeKnockOutContext context)
+
+
+        public EmployeeModelsController(EmployeeKnockOutContext context, IEmployeeService Employee)
         {
             _context = context;
+            _Employee = Employee;
         }
 
         // GET: api/EmployeeModels
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EmployeeModel>>> GetEmployeeModel(int skipcount = 0, int take = 0)
+        public async Task<ActionResult<dynamic>> GetEmployeeModel(int skipcount = 0, int take = 0)
         {
 
             if (_context.EmployeeModel == null)
             {
                 return null;
             };
-
-
-            var data = _context.EmployeeModel
-            .Skip(skipcount)
-            .Take(take)
-            .ToList();
-            if (data == null)
+            var result = new
             {
-                return null;
-            }
-            return data;
+                Data = _Employee.GetAll()
+                    .Skip(skipcount)
+                    .Take(take).ToList(),
+                Total = _context.EmployeeModel.Count()
+            };
+
+            
+            return result;
         }
 
         // GET: api/EmployeeModels/5
         [HttpGet("{id}")]
         public async Task<ActionResult<EmployeeModel>> GetEmployeeModel(int id)
         {
-          if (_context.EmployeeModel == null)
-          {
-              return NotFound();
-          }
-            var employeeModel = await _context.EmployeeModel.FindAsync(id);
+            if (_context.EmployeeModel == null)
+            {
+                return NotFound();
+            }
+            var employeeModel = await _Employee.GetEmployee(id);
 
             if (employeeModel == null)
             {
@@ -67,7 +71,7 @@ namespace EmployeeKnockOut.Controllers.API
         //        return null;
         //    };
 
-           
+
         //    var data = _context.EmployeeModel
         //    .Skip(skipcount)
         //    .Take(take)
@@ -86,32 +90,14 @@ namespace EmployeeKnockOut.Controllers.API
         // PUT: api/EmployeeModels/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmployeeModel(int id, EmployeeModel employeeModel)
+        public IActionResult PutEmployeeModel( int id, EmployeeModel employeeModel)
         {
-            if (id != employeeModel.Id)
+           if (id !=employeeModel.Id)
             {
                 return BadRequest();
             }
-
-            _context.Entry(employeeModel).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!EmployeeModelExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+           _Employee.UpdateEmployee(employeeModel);
+            return Ok();
         }
 
         // POST: api/EmployeeModels
@@ -119,34 +105,19 @@ namespace EmployeeKnockOut.Controllers.API
         [HttpPost]
         public async Task<ActionResult<EmployeeModel>> PostEmployeeModel(EmployeeModel employeeModel)
         {
-          if (_context.EmployeeModel == null)
-          {
-              return Problem("Entity set 'EmployeeKnockOutContext.EmployeeModel'  is null.");
-          }
-            _context.EmployeeModel.Add(employeeModel);
-            await _context.SaveChangesAsync();
-
+            if (_context.EmployeeModel == null)
+            {
+                return Problem("Entity set 'EmployeeKnockOutContext.EmployeeModel'  is null.");
+            }
+            _Employee.CreateEmployee(employeeModel);
             return CreatedAtAction("GetEmployeeModel", new { id = employeeModel.Id }, employeeModel);
         }
 
         // DELETE: api/EmployeeModels/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployeeModel(int id)
+        public void DeleteEmployeeModel(int id)
         {
-            if (_context.EmployeeModel == null)
-            {
-                return NotFound();
-            }
-            var employeeModel = await _context.EmployeeModel.FindAsync(id);
-            if (employeeModel == null)
-            {
-                return NotFound();
-            }
-
-            _context.EmployeeModel.Remove(employeeModel);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            _Employee.DeleteEmployee(id);
         }
 
         private bool EmployeeModelExists(int id)

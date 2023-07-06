@@ -1,12 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using EmployeeKnockOut.Data;
+using EmployeeKnockOut.Services.IServices;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<EmployeeKnockOutContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeKnockOutContext") ?? throw new InvalidOperationException("Connection string 'EmployeeKnockOutContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddTransient<IEmployeeService,EmployeeService>();
+
 
 var app = builder.Build();
 
